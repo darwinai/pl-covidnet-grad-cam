@@ -111,7 +111,10 @@ def grad_cam(input_model, image, category_index, layer_name):
         cam += w * output[:, :, i]
 
     cam = cv2.resize(cam, (224, 224))
-    cam = np.maximum(cam, 0)
+    
+    #shift values by min
+    cam -= np.min(cam)
+    # cam = np.maximum(cam, 0)
     heatmap = cam / np.max(cam)
 
     #Return to BGR [0..255] from the preprocessed image
@@ -119,10 +122,23 @@ def grad_cam(input_model, image, category_index, layer_name):
     image -= np.min(image)
     image = np.minimum(image, 255)
 
-    cam = cv2.applyColorMap(np.uint8(255*heatmap), cv2.COLORMAP_JET)
-    cam = np.float32(cam) + np.float32(image)
-    cam = 255 * cam / np.max(cam)
-    return np.uint8(cam), heatmap
+
+    _, cam = cv2.threshold(np.uint8(255*heatmap), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    cam = cam / np.max(cam)
+    cam = 1 - cam
+    edges = cv2.Canny(np.uint8(255*cam),0,255)
+    # cv2 channels formated as bgr
+    from copy import deepcopy
+    outlined_image = deepcopy(image)
+    outlined_image[:,:,2] += edges
+    outlined_image[outlined_image>255] = 255
+    
+    # masked_image = image*cam.reshape((224,224, 1))
+    # cam = cv2.applyColorMap(np.uint8(255*heatmap), cv2.COLORMAP_JET)
+    #cam = np.float32(cam) #+  np.float32(image)
+    #cam = cam / np.max(cam)
+
+    return np.uint8(outlined_image), heatmap
 
 preprocessed_input = load_image(sys.argv[1])
 
