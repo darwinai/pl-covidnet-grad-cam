@@ -6,4 +6,4 @@ docs/build
 htmlcov
 .docker
 .idea/
-covidnet/models
+grad-cam/models
