@@ -6,4 +6,4 @@ docs/build
 htmlcov
 .docker
 .idea/
-grad-cam/models
+grad_cam/models/
