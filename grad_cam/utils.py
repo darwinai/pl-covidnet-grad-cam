@@ -28,6 +28,7 @@ def visualize(image, conv_output, conv_grad):
         cam += w * output[:, :, i]
 
     # Passing through ReLU
+    cam2 = cam
     cam = np.maximum(cam, 0)
     cam = cam / np.max(cam)  # scale 0 to 1.0
     cam = resize(cam, (224, 224), preserve_range=True)
@@ -36,6 +37,7 @@ def visualize(image, conv_output, conv_grad):
     img -= np.min(img)
     img /= img.max()
     # print(img)
+
     cam_heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
     cam_heatmap = cv2.cvtColor(cam_heatmap, cv2.COLOR_BGR2RGB)
     img = resize(img, (224, 224))
@@ -43,6 +45,19 @@ def visualize(image, conv_output, conv_grad):
     cam_heatmap = np.float32(cam_heatmap) + np.float32(img)
     cam_heatmap = 255 * cam_heatmap / np.max(cam_heatmap)
     cam_heatmap = np.uint8(cam_heatmap)
+
+    cam2 -= np.min(cam2)
+    cam2 = cam2 / np.max(cam2)
+    _, cam_heatmap_2 = cv2.threshold(np.uint8(255 * cam2), 0, 255,
+                                     cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    cam_heatmap_2 = cam / np.max(cam_heatmap_2)
+    cam_heatmap_2 = 1 - cam_heatmap_2
+    edges = cv2.Canny(np.uint8(255 * cam_heatmap_2), 0, 255)
+    # cv2 channels formated as bgr
+    from copy import deepcopy
+    outlined_image = deepcopy(np.uint8(255 * img))
+    outlined_image[:, :, 2] += edges
+    outlined_image[outlined_image > 255] = 255
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -53,6 +68,11 @@ def visualize(image, conv_output, conv_grad):
     ax = fig.add_subplot(131)
     imgplot = plt.imshow(cam_heatmap)
     ax.set_title('Grad-CAM')
+
+    fig = plt.figure(figsize=(12, 16))
+    ax = fig.add_subplot(151)
+    imgplot = plt.imshow(outlined_image)
+    ax.set_title('Grad-CAM with Threshold')
 
     # gb_viz = np.dstack((
     #     gb_viz[:, :, 0],
