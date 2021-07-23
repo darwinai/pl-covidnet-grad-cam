@@ -31,7 +31,7 @@ def visualize(image, conv_output, conv_grad):
     cam2 = cam
     cam = np.maximum(cam, 0)
     cam = cam / np.max(cam)  # scale 0 to 1.0
-    cam = resize(cam, (224, 224), preserve_range=True)
+    cam = resize(cam, (480, 480), preserve_range=True)
 
     img = image.astype(float)
     img -= np.min(img)
@@ -40,7 +40,6 @@ def visualize(image, conv_output, conv_grad):
 
     cam_heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
     cam_heatmap = cv2.cvtColor(cam_heatmap, cv2.COLOR_BGR2RGB)
-    img = resize(img, (224, 224))
     cam_heatmap = cam_heatmap / np.max(cam_heatmap)
     cam_heatmap = np.float32(cam_heatmap) + np.float32(img)
     cam_heatmap = 255 * cam_heatmap / np.max(cam_heatmap)
@@ -48,16 +47,21 @@ def visualize(image, conv_output, conv_grad):
 
     cam2 -= np.min(cam2)
     cam2 = cam2 / np.max(cam2)
+    cam2 = resize(cam2, (480, 480), preserve_range=True)
     _, cam_heatmap_2 = cv2.threshold(np.uint8(255 * cam2), 0, 255,
                                      cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    cam_heatmap_2 = cam / np.max(cam_heatmap_2)
-    cam_heatmap_2 = 1 - cam_heatmap_2
-    edges = cv2.Canny(np.uint8(255 * cam_heatmap_2), 0, 255)
-    # cv2 channels formated as bgr
-    from copy import deepcopy
-    outlined_image = deepcopy(np.uint8(255 * img))
-    outlined_image[:, :, 2] += edges
-    outlined_image[outlined_image > 255] = 255
+    #cam_heatmap_2 = cam_heatmap_2 / np.max(cam_heatmap_2)
+    cam_heatmap_2 = 255 - cam_heatmap_2
+    cam_heatmap_2 = cv2.cvtColor(cam_heatmap_2, cv2.COLOR_GRAY2RGB)
+    purple = [104, 54, 169]
+    for i in range(3):
+        cam_heatmap_2[:, :, i] = cam_heatmap_2[:, :, i] / 255 * purple[i]
+    # edges = cv2.Canny(np.uint8(255 * cam_heatmap_2), 0, 255)
+    # # cv2 channels formated as bgr
+    # from copy import deepcopy
+    # outlined_image = deepcopy(np.uint8(255 * img))
+    # outlined_image[:, :, 2] += edges
+    # outlined_image[outlined_image > 255] = 255
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -71,7 +75,7 @@ def visualize(image, conv_output, conv_grad):
 
     fig = plt.figure(figsize=(12, 16))
     ax = fig.add_subplot(151)
-    imgplot = plt.imshow(outlined_image)
+    imgplot = plt.imshow(cam_heatmap_2, vmin=0, vmax=255)
     ax.set_title('Grad-CAM with Threshold')
 
     # gb_viz = np.dstack((
