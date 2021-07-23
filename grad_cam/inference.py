@@ -9,7 +9,6 @@ import warnings
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-import os
 import json
 from data import process_image_file
 import utils
