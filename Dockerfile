@@ -1,5 +1,5 @@
 FROM fnndsc/ubuntu-python3:18.04
-MAINTAINER fnndsc "dev@babymri.org"
+LABEL author="fnndsc dev@babymri.org"
 
 ENV APPROOT="/usr/src/grad_cam"
 ENV DEBIAN_FRONTEND=noninteractive
