@@ -1,15 +1,6 @@
-import skimage
-import skimage.io
-import skimage.transform
 import numpy as np
 
 from matplotlib import pyplot as plt
-from matplotlib.pyplot import imshow
-import matplotlib.image as mpimg
-
-import tensorflow as tf
-
-from skimage import io
 from skimage.transform import resize
 
 import cv2
