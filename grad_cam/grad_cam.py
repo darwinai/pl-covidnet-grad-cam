@@ -13,7 +13,7 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(__file__))
-
+from inference import Inference
 # import the Chris app superclass
 from chrisapp.base import ChrisApp
 
@@ -141,6 +141,11 @@ class GradCam(ChrisApp):
                           type=str,
                           optional=False,
                           help='Name of image file to infer from')
+        self.add_argument('--pred_matrix',
+                          dest='pred_matrix',
+                          type=str,
+                          optional=False,
+                          help='Name of file containing prediction matrix')
         self.add_argument(
             '--input_size',
             dest='input_size',
@@ -155,6 +160,18 @@ class GradCam(ChrisApp):
                           help='Percent top crop from top of image',
                           default=0.08)
 
+    def add_model_to_options(self, options, model_info):
+        options.weightspath = os.getcwd() + model_info['weightspath']
+        options.ckptname = model_info['ckptname']
+        options.metaname = model_info['metaname']
+        options.in_tensor = model_info['in_tensor']
+        options.out_softmax_tensor = model_info['out_softmax_tensor']
+        options.labels_tensor = model_info['labels_tensor']
+        options.sample_weights_tensor = model_info['sample_weights_tensor']
+        options.out_logit_tensor = model_info['out_logit_tensor']
+        options.last_conv_out_tensor = model_info['last_conv_out_tensor']
+        return options
+
     def run(self, options):
         """
         Define the code to be run by this plugin app.
@@ -165,12 +182,18 @@ class GradCam(ChrisApp):
             'COVIDNet-CXR4-B': {
                 'weightspath': '/models/COVIDNet-CXR4-B',
                 'ckptname': 'model-1545',
+                'metaname': 'model.meta',
+                'in_tensor': 'input_1:0',
+                'out_softmax_tensor': 'norm_dense_1/Softmax:0',
+                'labels_tensor': 'norm_dense_1_target:0',
+                'sample_weights_tensor': 'norm_dense_1_sample_weights:0',
+                'out_logit_tensor': 'norm_dense_1/MatMul:0',
+                'last_conv_out_tensor': 'conv5_block3_out/add:0'
             }
         }
-
-        model = models[options.modelname]
-        options.weightspath = os.getcwd() + model['weightspath']
-        options.ckptname = model['ckptname']
+        options = self.add_model_to_options(options, models[options.modelname])
+        inference = Inference(options)
+        inference.infer()
 
     def show_man_page(self):
         """
