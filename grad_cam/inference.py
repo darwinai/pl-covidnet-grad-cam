@@ -11,33 +11,11 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import json
 from data import process_image_file
-import utils
 
 import numpy as np
-import sys
-
-
-def readInput():
-    image = process_image_file(sys.argv[1], 0.08, 480)
-
-    with open(sys.argv[2], 'r') as f:
-        input = json.load(f)
-        prediction_matrix = np.array([
-            float(x)
-            for x in [input['Normal'], input['Pneumonia'], input['COVID-19']]
-        ])
-    return image, prediction_matrix
-
-
-def readInput2():
-    image = process_image_file(sys.argv[1], 0.08, 480)
-
-    with open(sys.argv[2], 'r') as f:
-        input = json.load(f)
-        print(input)
-        prediction_matrix = np.array(input)
-        print(prediction_matrix)
-    return image, prediction_matrix
+from skimage.transform import resize
+import cv2
+import shutil
 
 
 class Inference():
@@ -73,29 +51,13 @@ class Inference():
                 sess, os.path.join(self.args.weightspath, self.args.ckptname))
 
             graph = tf.get_default_graph()
-            # placeholders = [
-            #     op for op in graph.get_operations() if op.type == "Placeholder"
-            # ]
-            # print(placeholders)
             image_tensor = graph.get_tensor_by_name(self.args.in_tensor)
-            # pred_tensor = graph.get_tensor_by_name('norm_dense_1/Softmax:0')
-
-            # x = preprocessed_input
-            # x = x.astype('float32') / 255.0
-            # pred = sess.run(
-            #     pred_tensor,
-            #     feed_dict={image_tensor: np.expand_dims(x, axis=0)})
-            # print(pred)
             labels_tensor = graph.get_tensor_by_name(self.args.labels_tensor)
             sample_weights = graph.get_tensor_by_name(
                 self.args.sample_weights_tensor)
             pred_logit_tensor = graph.get_tensor_by_name(
                 self.args.out_logit_tensor)
-            # pred_softmax_tensor = graph.get_tensor_by_name(
-            #     self.args.out_softmax_tensor)
-            # image_tensor = graph.get_tensor_by_name('input_1:0')
-            # loss expects unscaled logits since it performs a softmax on logits internally for efficiency
-            # Define loss and optimizer
+            # Define loss
             loss_op = tf.reduce_mean(
                 tf.nn.softmax_cross_entropy_with_logits_v2(
                     logits=pred_logit_tensor, labels=labels_tensor) *
@@ -126,8 +88,39 @@ class Inference():
             print(np.amin(target_conv_layer_value))
             print(np.amax(target_conv_layer_grad_value))
             print(np.amin(target_conv_layer_grad_value))
-        utils.visualize(preprocessed_input, target_conv_layer_value[0],
-                        target_conv_layer_grad_value[0])
-        # cam, heatmap = grad_cam(graph, preprocessed_input, predicted_,
-        #                         "block5_conv3")
-        # cv2.imwrite("gradcam.jpg", cam)
+        # utils.visualize(preprocessed_input, target_conv_layer_value[0],
+        #                 target_conv_layer_grad_value[0])
+        self.generate_mask(target_conv_layer_value[0],
+                           target_conv_layer_grad_value[0])
+
+    def generate_mask(self, conv_output, conv_grad):
+
+        weights = np.mean(conv_grad, axis=(0, 1))
+        cam = np.zeros(conv_output.shape[0:2], dtype=np.float32)
+
+        # Taking a weighted average
+        for i, w in enumerate(weights):
+            cam += w * conv_output[:, :, i]
+
+        cam -= np.min(cam)
+        cam = cam / np.max(cam)
+        size = self.args.input_size
+        # TO DO: resize heatmap to dimensions of raw input and mask the cropped out areas
+        cam = resize(cam, (size, size), preserve_range=True)
+        _, cam_heatmap = cv2.threshold(np.uint8(255 * cam), 0, 255,
+                                       cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        #cam_heatmap = cam_heatmap / np.max(cam_heatmap)
+        cam_heatmap = 255 - cam_heatmap
+        cam_heatmap = cv2.cvtColor(cam_heatmap, cv2.COLOR_GRAY2RGB)
+        purple = [105, 54, 169]
+        for i in range(3):
+            cam_heatmap[:, :, i] = cam_heatmap[:, :, i] / 255 * purple[i]
+
+        file_name = self.args.imagefile.split('.')
+        mask_file_name = f"{self.args.outputdir}/{file_name[0]}-mask.{file_name[1]}"
+        print(f"Creating {mask_file_name} in {self.args.outputdir}")
+        cv2.imwrite(mask_file_name, cam_heatmap)
+
+        print(f"Copying over the input image to {self.args.outputdir}")
+        shutil.copy(f"{self.args.inputdir}/{self.args.imagefile}",
+                    self.args.outputdir)
