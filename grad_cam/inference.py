@@ -90,10 +90,10 @@ class Inference():
             print(np.amin(target_conv_layer_grad_value))
         # utils.visualize(preprocessed_input, target_conv_layer_value[0],
         #                 target_conv_layer_grad_value[0])
-        self.generate_mask(target_conv_layer_value[0],
+        self.generate_mask(preprocessed_input, target_conv_layer_value[0],
                            target_conv_layer_grad_value[0])
 
-    def generate_mask(self, conv_output, conv_grad):
+    def generate_mask(self, preprocessed_input, conv_output, conv_grad):
 
         weights = np.mean(conv_grad, axis=(0, 1))
         cam = np.zeros(conv_output.shape[0:2], dtype=np.float32)
@@ -120,6 +120,13 @@ class Inference():
         mask_file_name = f"{self.args.outputdir}/{file_name[0]}-mask.{file_name[1]}"
         print(f"Creating {mask_file_name} in {self.args.outputdir}")
         cv2.imwrite(mask_file_name, cam_heatmap)
+
+        # TO DO: omit preprocessed input when mask fits the dimensions of the raw input
+        preprocessed_input_file_path = f"{self.args.outputdir}/{file_name[0]}-preprocessed.{file_name[1]}"
+        print(
+            f"Creating {preprocessed_input_file_path} in {self.args.outputdir}"
+        )
+        cv2.imwrite(preprocessed_input_file_path, preprocessed_input)
 
         print(f"Copying over the input image to {self.args.outputdir}")
         shutil.copy(f"{self.args.inputdir}/{self.args.imagefile}",
