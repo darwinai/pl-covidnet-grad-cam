@@ -105,21 +105,20 @@ class Inference():
         cam -= np.min(cam)
         cam = cam / np.max(cam)
         size = self.args.input_size
-        # TO DO: resize heatmap to dimensions of raw input and mask the cropped out areas
+        # TO DO: resize mask to dimensions of raw input and mask the cropped out areas
         cam = resize(cam, (size, size), preserve_range=True)
-        _, cam_heatmap = cv2.threshold(np.uint8(255 * cam), 0, 255,
-                                       cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        #cam_heatmap = cam_heatmap / np.max(cam_heatmap)
-        cam_heatmap = 255 - cam_heatmap
-        cam_heatmap = cv2.cvtColor(cam_heatmap, cv2.COLOR_GRAY2RGB)
+        _, cam_mask = cv2.threshold(np.uint8(255 * cam), 0, 255,
+                                    cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        cam_mask = 255 - cam_mask
+        cam_mask = cv2.cvtColor(cam_mask, cv2.COLOR_GRAY2RGB)
         purple = [105, 54, 169]
         for i in range(3):
-            cam_heatmap[:, :, i] = cam_heatmap[:, :, i] / 255 * purple[i]
+            cam_mask[:, :, i] = cam_mask[:, :, i] / 255 * purple[i]
 
         file_name = self.args.imagefile.split('.')
-        mask_file_name = f"{self.args.outputdir}/{file_name[0]}-mask.{file_name[1]}"
-        print(f"Creating {mask_file_name} in {self.args.outputdir}")
-        cv2.imwrite(mask_file_name, cam_heatmap)
+        mask_file_path = f"{self.args.outputdir}/{file_name[0]}-mask.{file_name[1]}"
+        print(f"Creating {mask_file_path} in {self.args.outputdir}")
+        cv2.imwrite(mask_file_path, cam_mask)
 
         # TO DO: omit preprocessed input when mask fits the dimensions of the raw input
         preprocessed_input_file_path = f"{self.args.outputdir}/{file_name[0]}-preprocessed.{file_name[1]}"
