@@ -1,6 +1,8 @@
 FROM fnndsc/ubuntu-python3:18.04
 LABEL author="fnndsc dev@babymri.org"
 
+RUN mkdir /usr/src/grad_cam
+
 ENV APPROOT="/usr/src/grad_cam"
 ENV DEBIAN_FRONTEND=noninteractive
 COPY ["requirements.txt", "${APPROOT}"]
