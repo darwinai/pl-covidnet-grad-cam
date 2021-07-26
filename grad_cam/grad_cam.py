@@ -34,7 +34,7 @@ where necessary.)
 
     NAME
 
-       covidnet.py 
+       grad_cam.py 
 
     SYNOPSIS
 
