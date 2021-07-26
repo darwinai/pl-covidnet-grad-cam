@@ -44,9 +44,14 @@ def visualize(image, conv_output, conv_grad):
     #cam_heatmap_2 = cam_heatmap_2 / np.max(cam_heatmap_2)
     cam_heatmap_2 = 255 - cam_heatmap_2
     cam_heatmap_2 = cv2.cvtColor(cam_heatmap_2, cv2.COLOR_GRAY2RGB)
-    purple = [104, 54, 169]
+    purple = [105, 54, 169]
     for i in range(3):
         cam_heatmap_2[:, :, i] = cam_heatmap_2[:, :, i] / 255 * purple[i]
+    # img = cv2.cvtColor(np.float32(img), cv2.COLOR_BGR2RGBA)
+    cam_heatmap_2_overlayed = np.float32(255 * img) + np.float32(cam_heatmap_2)
+    cam_heatmap_2_overlayed = 255 * cam_heatmap_2_overlayed / np.max(
+        cam_heatmap_2_overlayed)
+    cam_heatmap_2_overlayed = np.uint8(cam_heatmap_2_overlayed)
     # edges = cv2.Canny(np.uint8(255 * cam_heatmap_2), 0, 255)
     # # cv2 channels formated as bgr
     # from copy import deepcopy
@@ -66,7 +71,7 @@ def visualize(image, conv_output, conv_grad):
 
     fig = plt.figure(figsize=(12, 16))
     ax = fig.add_subplot(151)
-    imgplot = plt.imshow(cam_heatmap_2, vmin=0, vmax=255)
+    imgplot = plt.imshow(cam_heatmap_2_overlayed, vmin=0, vmax=255)
     ax.set_title('Grad-CAM with Threshold')
 
     # gb_viz = np.dstack((
