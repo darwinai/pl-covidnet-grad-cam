@@ -14,8 +14,8 @@ def central_crop(img):
 
 
 def process_image_file(filepath, top_percent, size):
-    img = cv2.imread(filepath)
-    img = crop_top(img, percent=top_percent)
+    original_img = cv2.imread(filepath)
+    img = crop_top(original_img, percent=top_percent)
     img = central_crop(img)
     img = cv2.resize(img, (size, size))
     return img
