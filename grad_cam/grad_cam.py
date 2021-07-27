@@ -141,8 +141,8 @@ class GradCam(ChrisApp):
                           type=str,
                           optional=False,
                           help='Name of image file to infer from')
-        self.add_argument('--pred_matrix',
-                          dest='pred_matrix',
+        self.add_argument('--predmatrix',
+                          dest='predmatrix',
                           type=str,
                           optional=False,
                           help='Name of file containing prediction matrix')
