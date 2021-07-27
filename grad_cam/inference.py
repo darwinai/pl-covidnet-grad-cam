@@ -30,7 +30,7 @@ class Inference():
         imagepath = f"{self.args.inputdir}/{self.args.imagefile}"
         image = process_image_file(imagepath, self.args.top_percent,
                                    self.args.input_size)
-        pred_matrix = f"{self.args.inputdir}/{self.args.pred_matrix}"
+        pred_matrix = f"{self.args.inputdir}/{self.args.predmatrix}"
         with open(pred_matrix, 'r') as f:
             input = json.load(f)
             print(input)
