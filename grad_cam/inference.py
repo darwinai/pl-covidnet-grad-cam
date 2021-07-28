@@ -33,9 +33,7 @@ class Inference():
         pred_matrix = f"{self.args.inputdir}/{self.args.predmatrix}"
         with open(pred_matrix, 'r') as f:
             input = json.load(f)
-            print(input)
             prediction_matrix = np.array(input)
-            print(prediction_matrix)
         return image, prediction_matrix
 
     def infer(self):
@@ -80,16 +78,6 @@ class Inference():
                     labels_tensor:
                     np.reshape(one_hot, (-1, 3))
                 })
-            print(np.reshape(prediction_matrix, (-1, 3)))
-            print(preprocessed_input.shape)
-            print(target_conv_layer_value.shape)
-            print(target_conv_layer_grad_value.shape)
-            print(np.amax(target_conv_layer_value))
-            print(np.amin(target_conv_layer_value))
-            print(np.amax(target_conv_layer_grad_value))
-            print(np.amin(target_conv_layer_grad_value))
-        # utils.visualize(preprocessed_input, target_conv_layer_value[0],
-        #                 target_conv_layer_grad_value[0])
         self.generate_mask(preprocessed_input, target_conv_layer_value[0],
                            target_conv_layer_grad_value[0])
 
