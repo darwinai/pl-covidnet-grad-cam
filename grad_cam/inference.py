@@ -110,18 +110,25 @@ class Inference():
         _, cam_mask = cv2.threshold(np.uint8(255 * cam), 0, 255,
                                     cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         cam_mask = 255 - cam_mask
-        cam_mask = cv2.cvtColor(cam_mask, cv2.COLOR_GRAY2RGB)
-        purple = [105, 54, 169]
-        for i in range(3):
-            cam_mask[:, :, i] = cam_mask[:, :, i] / 255 * purple[i]
+        cam_mask_rgba = cv2.cvtColor(cam_mask, cv2.COLOR_GRAY2RGBA)
+        cam_mask_copy = cam_mask
+
+        # Gaussian blur applied to add gradient to mask from edges to center
+        cam_mask = cv2.GaussianBlur(cam_mask, (201, 201), 0)
+        # Removes dark shadow that results from gaussian blur
+        cam_mask[cam_mask_copy == 0] = 0
+
+        purple = [49, 20, 50]
+        cam_mask_rgba[:, :, :3] = cam_mask_rgba[:, :, :3] / 255 * purple
+        cam_mask_rgba[:, :, 3] = cam_mask
 
         file_name = self.args.imagefile.split('.')
-        mask_file_path = f"{self.args.outputdir}/{file_name[0]}-mask.{file_name[1]}"
+        mask_file_path = f"{self.args.outputdir}/{file_name[0]}-mask.png"
         print(f"Creating {mask_file_path} in {self.args.outputdir}")
-        cv2.imwrite(mask_file_path, cam_mask)
+        cv2.imwrite(mask_file_path, cam_mask_rgba)
 
         # TO DO: omit preprocessed input when mask fits the dimensions of the raw input
-        preprocessed_input_file_path = f"{self.args.outputdir}/{file_name[0]}-preprocessed.{file_name[1]}"
+        preprocessed_input_file_path = f"{self.args.outputdir}/{file_name[0]}-preprocessed.png"
         print(
             f"Creating {preprocessed_input_file_path} in {self.args.outputdir}"
         )
