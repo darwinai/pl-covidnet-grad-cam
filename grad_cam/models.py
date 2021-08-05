@@ -8,6 +8,7 @@ class Model:
         self.args = args
         tf.reset_default_graph()
         self.sess = tf.Session()
+        self.load_model()
 
     def load_model(self):
         saver = tf.train.import_meta_graph(
