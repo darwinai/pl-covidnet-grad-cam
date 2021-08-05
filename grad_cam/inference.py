@@ -52,8 +52,6 @@ class Inference():
     def infer(self):
         preprocessed_input, prediction_matrix = self.process_input()
 
-        self.model.load_model()
-
         loss_op = self.model.get_loss_op()
         conv_output = self.model.get_conv_output_tensor()
         one_hot = self.model.get_one_hot(prediction_matrix)
