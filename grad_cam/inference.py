@@ -1,3 +1,4 @@
+from models import Covidnet
 import tensorflow as tf
 import os
 
@@ -25,7 +26,13 @@ class Inference():
         '''
     def __init__(self, args):
         self.args = args
-        self.sess = tf.Session()
+        self.model = self.get_model_instance(args.modelname)
+
+    def get_model_instance(self, model_name):
+        if model_name == 'COVIDNet-CXR4-B':
+            return Covidnet(self.args)
+        else:
+            return None
 
     def process_input(self):
         imagepath = f"{self.args.inputdir}/{self.args.imagefile}"
@@ -37,62 +44,25 @@ class Inference():
             prediction_matrix = np.array(input)
         return image, prediction_matrix
 
-    def load_model(self):
-        saver = tf.train.import_meta_graph(
-            os.path.join(self.args.weightspath, self.args.metaname))
-        saver.restore(self.sess,
-                      os.path.join(self.args.weightspath, self.args.ckptname))
-
-    def get_tensors(self):
-        graph = tf.get_default_graph()
-        image_tensor = graph.get_tensor_by_name(self.args.in_tensor)
-        labels_tensor = graph.get_tensor_by_name(self.args.labels_tensor)
-        sample_weights = graph.get_tensor_by_name(
-            self.args.sample_weights_tensor)
-        pred_logit_tensor = graph.get_tensor_by_name(
-            self.args.out_logit_tensor)
-        conv_output = graph.get_tensor_by_name(self.args.last_conv_out_tensor)
-        return image_tensor, labels_tensor, sample_weights, \
-            pred_logit_tensor, conv_output
-
-    def get_covidnet_loss(self, pred_logit_tensor, labels_tensor,
-                          sample_weights):
-        return tf.reduce_mean(
-            tf.nn.softmax_cross_entropy_with_logits_v2(
-                logits=pred_logit_tensor, labels=labels_tensor) *
-            sample_weights)
-
-    def create_one_hot(self, prediction_matrix):
-        one_hot = np.zeros_like(prediction_matrix[0])
-        one_hot[np.argmax(prediction_matrix[0])] = 1
-        return one_hot
-
     def grad_cam(self, loss_op, conv_output, feed_dict):
         target_conv_layer_grad = tf.gradients(loss_op, conv_output)[0]
-        return self.sess.run([conv_output, target_conv_layer_grad],
-                             feed_dict=feed_dict)
+        return self.model.get_session().run(
+            [conv_output, target_conv_layer_grad], feed_dict=feed_dict)
 
     def infer(self):
         preprocessed_input, prediction_matrix = self.process_input()
 
-        self.load_model()
+        self.model.load_model()
 
-        image_tensor, labels_tensor, sample_weights, pred_logit_tensor, conv_output = self.get_tensors(
-        )
-        loss_op = self.get_covidnet_loss(pred_logit_tensor, labels_tensor,
-                                         sample_weights)
-        one_hot = self.create_one_hot(prediction_matrix)
+        loss_op = self.model.get_loss_op()
+        conv_output = self.model.get_conv_output_tensor()
+        one_hot = self.model.get_one_hot(prediction_matrix)
+
+        feed_dict = self.model.get_feed_dict(preprocessed_input, one_hot)
 
         target_conv_layer_value, target_conv_layer_grad_value = self.grad_cam(
-            loss_op, conv_output, {
-                image_tensor:
-                np.expand_dims(preprocessed_input.astype('float32') / 255.0,
-                               axis=0),
-                sample_weights:
-                np.array([1]),
-                labels_tensor:
-                np.reshape(one_hot, (-1, 3))
-            })
+            loss_op, conv_output, feed_dict)
+
         self.generate_mask(preprocessed_input, target_conv_layer_value[0],
                            target_conv_layer_grad_value[0])
 
@@ -145,6 +115,3 @@ class Inference():
         print(f"Copying over the input image to {self.args.outputdir}")
         shutil.copy(f"{self.args.inputdir}/{self.args.imagefile}",
                     self.args.outputdir)
-
-    def __del__(self):
-        self.sess.close()
