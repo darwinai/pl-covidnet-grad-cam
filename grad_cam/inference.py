@@ -101,8 +101,12 @@ class Inference():
         cam_mask_rgba = cv2.cvtColor(cam_mask, cv2.COLOR_GRAY2RGBA)
         cam_mask_copy = cam_mask
 
+        # erosion applied for a smoother gradient inwards
+        cam_mask = cv2.erode(cam_mask,
+                             np.ones((25, 25), np.uint8),
+                             iterations=1)
         # Gaussian blur applied to add gradient to mask from edges to center
-        cam_mask = cv2.GaussianBlur(cam_mask, (201, 201), 0)
+        cam_mask = cv2.GaussianBlur(cam_mask, (275, 275), 0)
         # Removes dark shadow that results from gaussian blur
         cam_mask[cam_mask_copy == 0] = 0
 
