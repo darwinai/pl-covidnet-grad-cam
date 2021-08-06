@@ -39,13 +39,14 @@ where necessary.)
     SYNOPSIS
 
         python grad_cam.py                                         \\
-            [-h] [--help]                                               \\
-            [--json]                                                    \\
+            [-h] [--help]                                               \\                                                 
             [--man]                                                     \\
-            [--meta]                                                    \\
-            [--savejson <DIR>]                                          \\
+            [--meta]                                                    \\                                       
             [-v <level>] [--verbosity <level>]                          \\
             [--version]                                                 \\
+            [--modelname <modelname>]                                   \\
+            --imagefile <imagefile>                                   \\ 
+            --predmatrix <predmatrix>                                   \\
             <inputDir>                                                  \\
             <outputDir> 
 
@@ -66,23 +67,27 @@ where necessary.)
         [-h] [--help]
         If specified, show help message and exit.
         
-        [--json]
-        If specified, show json representation of app and exit.
-        
         [--man]
         If specified, print (this) man page and exit.
 
         [--meta]
         If specified, print plugin meta data and exit.
         
-        [--savejson <DIR>] 
-        If specified, save json representation file to DIR and exit. 
-        
         [-v <level>] [--verbosity <level>]
         Verbosity level for app. Not used currently.
         
         [--version]
         If specified, print version number and exit. 
+
+        [--modelname]
+        The name of the model being used, this is optional (default is COVIDNET).
+
+        [--imagefile]
+        The name of the input image in the input directory, this is required
+
+        [--predmatrix]
+        The name of the prediction matrix file in the input directory, this is required
+
 
 """
 
