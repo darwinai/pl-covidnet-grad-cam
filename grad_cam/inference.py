@@ -106,9 +106,10 @@ class Inference():
                              np.ones((25, 25), np.uint8),
                              iterations=1)
         # Gaussian blur applied to add gradient to mask from edges to center
-        cam_mask = cv2.GaussianBlur(cam_mask, (275, 275), 0)
+        cam_mask = cv2.GaussianBlur(cam_mask, (51, 51), 0)
+
         # Removes dark shadow that results from gaussian blur
-        cam_mask[cam_mask_copy == 0] = 0
+        # cam_mask[cam_mask_copy == 0] = 0
 
         purple = [49, 20, 50]
         cam_mask_rgba[:, :, :3] = cam_mask_rgba[:, :, :3] / 255 * purple
