@@ -59,7 +59,7 @@ Setup
 -----
 
 Download the relevant machine learning models whose results will be used as input
-For example, for COVID-NET, download COVIDNet-CXR4-B from https://github.com/lindawangg/COVID-Net/blob/master/docs/models
+For example, for COVID-NET, download COVIDNet-CXR4-B from https://github.com/lindawangg/COVID-Net/blob/master/docs/models.md
 
 Then, put the downloaded folder(s) in grad_cam/models
 
