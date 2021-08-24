@@ -50,6 +50,9 @@ class Inference():
             [conv_output, target_conv_layer_grad], feed_dict=feed_dict)
 
     def infer(self):
+        """
+         Workflow and algorithm have not been algorithmically nor clinically verified
+        """
         preprocessed_input, prediction_matrix = self.process_input()
 
         loss_op = self.model.get_loss_op()
