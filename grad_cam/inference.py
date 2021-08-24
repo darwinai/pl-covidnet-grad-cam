@@ -99,7 +99,7 @@ class Inference():
                                     cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         cam_mask = 255 - cam_mask
         cam_mask_rgba = cv2.cvtColor(cam_mask, cv2.COLOR_GRAY2RGBA)
-        cam_mask_copy = cam_mask
+        # cam_mask_copy = cam_mask
 
         # erosion applied for a smoother gradient inwards
         cam_mask = cv2.erode(cam_mask,
