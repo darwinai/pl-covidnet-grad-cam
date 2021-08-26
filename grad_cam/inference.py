@@ -1,22 +1,24 @@
-from model_classes import Covidnet
-import tensorflow as tf
 import os
 
+import tensorflow as tf
+
 # To remove TF Warnings
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 import warnings
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import json
-from data import process_image_file
+import shutil
 
+import cv2
 import numpy as np
 from skimage.transform import resize
-import cv2
-import shutil
+
+from data import process_image_file
+from model_classes import Covidnet
 
 
 class Inference():
