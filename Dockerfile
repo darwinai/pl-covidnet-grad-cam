@@ -1,6 +1,5 @@
 FROM fnndsc/ubuntu-python3:18.04
-LABEL author="fnndsc dev@babymri.org"
-
+LABEL author="darwinai support@darwinai.com"
 RUN mkdir /usr/src/grad_cam
 
 ENV APPROOT="/usr/src/grad_cam"
@@ -11,8 +10,8 @@ WORKDIR $APPROOT
 
 RUN apt-get update \
   && apt-get install -y libsm6 libxext6 libxrender-dev python3-tk\
-    && pip install --upgrade pip \
-      && pip install -r requirements.txt
+  && pip install --upgrade pip \
+  && pip install -r requirements.txt
 
 COPY ["grad_cam", "${APPROOT}"]
 

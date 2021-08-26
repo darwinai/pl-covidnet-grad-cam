@@ -1,4 +1,4 @@
-from models import Covidnet
+from model_classes import Covidnet
 import tensorflow as tf
 import os
 
@@ -35,10 +35,10 @@ class Inference():
             return None
 
     def process_input(self):
-        imagepath = f"{self.args.inputdir}/{self.args.imagefile}"
+        imagepath = os.path.join(self.args.inputdir, self.args.imagefile)
         image = process_image_file(imagepath, self.args.top_percent,
                                    self.args.input_size)
-        pred_matrix = f"{self.args.inputdir}/{self.args.predmatrix}"
+        pred_matrix = os.path.join(self.args.inputdir, self.args.predmatrix)
         with open(pred_matrix, 'r') as f:
             input = json.load(f)
             prediction_matrix = np.array(input)
