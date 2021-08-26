@@ -24,7 +24,7 @@ setup(
     long_description=readme(),
     author='DarwinAI (Matthew Wang)',
     author_email='matthew.wang@darwinai.ca',
-    url='http://wiki',
+    url='https://github.com/darwinai/pl-grad-cam',
     packages=['grad_cam'],
     install_requires=['chrisapp', 'pudb'],
     test_suite='nose.collector',
