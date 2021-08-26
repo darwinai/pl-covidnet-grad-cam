@@ -19,14 +19,14 @@ from chrisapp.base import ChrisApp
 
 Gstr_title = """
 
-Generate a title from 
+Generate a title from
 http://patorjk.com/software/taag/#p=display&f=Doom&t=Grad-CAM
 
 """
 
 Gstr_synopsis = """
 
-(Edit this in-line help for app specifics. At a minimum, the 
+(Edit this in-line help for app specifics. At a minimum, the
 flags below are supported -- in the case of DS apps, both
 positional arguments <inputDir> and <outputDir>; for FS apps
 only <outputDir> -- and similarly for <in> <out> directories
@@ -34,21 +34,21 @@ where necessary.)
 
     NAME
 
-       grad_cam.py 
+       grad_cam.py
 
     SYNOPSIS
 
         python grad_cam.py                                         \\
-            [-h] [--help]                                               \\                                                 
-            [--man]                                                     \\
-            [--meta]                                                    \\                                       
-            [-v <level>] [--verbosity <level>]                          \\
-            [--version]                                                 \\
-            [--modelname <modelname>]                                   \\
-            --imagefile <imagefile>                                   \\ 
-            --predmatrix <predmatrix>                                   \\
-            <inputDir>                                                  \\
-            <outputDir> 
+            [-h] [--help]                                          \\
+            [--man]                                                \\
+            [--meta]                                               \\
+            [-v <level>] [--verbosity <level>]                     \\
+            [--version]                                            \\
+            [--modelname <modelname>]                              \\
+            --imagefile <imagefile>                                \\
+            --predmatrix <predmatrix>                              \\
+            <inputDir>                                             \\
+            <outputDir>
 
     BRIEF EXAMPLE
 
@@ -66,18 +66,18 @@ where necessary.)
 
         [-h] [--help]
         If specified, show help message and exit.
-        
+
         [--man]
         If specified, print (this) man page and exit.
 
         [--meta]
         If specified, print plugin meta data and exit.
-        
+
         [-v <level>] [--verbosity <level>]
         Verbosity level for app. Not used currently.
-        
+
         [--version]
-        If specified, print version number and exit. 
+        If specified, print version number and exit.
 
         [--modelname]
         The name of the model being used, this is optional (default is COVIDNET).
@@ -104,7 +104,7 @@ class GradCam(ChrisApp):
     CATEGORY = ''
     TYPE = 'ds'
     DESCRIPTION = 'Plugin to ChRIS for Grad-CAM functionalities'
-    DOCUMENTATION = 'http://wiki'
+    DOCUMENTATION = 'https://github.com/darwinai/pl-grad-cam'
     VERSION = '0.1'
     ICON = ''  # url of an icon image
     LICENSE = 'AGPL 3.0'

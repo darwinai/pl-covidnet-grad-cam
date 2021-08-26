@@ -10,19 +10,19 @@ ChRIS Plugin for Explainable AI visualization using the Grad-CAM algorithm
 Synopsis
 --------
 
-.. code:: python
+.. code::
 
-    python grad_cam.py                                         \\
-    [-h] [--help]                                               \\                                                 
-    [--man]                                                     \\
-    [--meta]                                                    \\                                       
-    [-v <level>] [--verbosity <level>]                          \\
-    [--version]                                                 \\
-    [--modelname <modelname>]                                   \\
-    --imagefile <imagefile>                                   \\ 
-    --predmatrix <predmatrix>                                   \\
-    <inputDir>                                                  \\
-    <outputDir>
+    python grad_cam.py                           \
+        [-h] [--help]                            \
+        [--man]                                  \
+        [--meta]                                 \
+        [-v <level>] [--verbosity <level>]       \
+        [--version]                              \
+        [--modelname <modelname>]                \
+        --imagefile <imagefile>                  \
+        --predmatrix <predmatrix>                \
+        <inputDir>                               \
+        <outputDir>
 
 
 Arguments
@@ -43,7 +43,7 @@ Arguments
     Verbosity level for app. Not used currently.
 
     [--version]
-    If specified, print version number and exit. 
+    If specified, print version number and exit.
 
     [--modelname]
     The name of the model being used, this is optional (default is COVIDNET).
