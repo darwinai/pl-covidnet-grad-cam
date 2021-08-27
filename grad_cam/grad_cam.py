@@ -80,7 +80,7 @@ where necessary.)
         If specified, print version number and exit.
 
         [--modelname]
-        The name of the model being used, this is optional (default is COVIDNET).
+        The name of the model being used, this is optional (default is COVIDNet-CXR4-B).
 
         [--imagefile]
         The name of the input image in the input directory, this is required
