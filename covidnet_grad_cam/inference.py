@@ -1,24 +1,19 @@
 import os
 
-import tensorflow as tf
-
-# To remove TF Warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
-
-import warnings
-
-warnings.simplefilter(action='ignore', category=FutureWarning)
 
 import json
 import shutil
-
 import cv2
 import numpy as np
+import tensorflow as tf
+
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+
 from skimage.transform import resize
 
-from data import process_image_file
-from model_classes import Covidnet
+from covidnet_grad_cam.data import process_image_file
+from covidnet_grad_cam.model_classes import Covidnet
 
 
 class Inference():
@@ -81,7 +76,7 @@ class Inference():
         cam -= np.min(cam)
         cam = cam / np.max(cam)
         size = self.args.input_size
-        # TO DO: resize mask to dimensions of raw input and mask the cropped out areas
+        # TODO: resize mask to dimensions of raw input and mask the cropped out areas
         cam = resize(cam, (size, size), preserve_range=True)
         _, cam_mask = cv2.threshold(np.uint8(255 * cam), 0, 255,
                                     cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -108,7 +103,7 @@ class Inference():
         print(f"Creating {mask_file_path} in {self.args.outputdir}")
         cv2.imwrite(mask_file_path, cam_mask_rgba)
 
-        # TO DO: omit preprocessed input when mask fits the dimensions of the raw input
+        # TODO: omit preprocessed input when mask fits the dimensions of the raw input
         preprocessed_input_file_path = f"{self.args.outputdir}/{file_name[0]}-preprocessed.png"
         print(
             f"Creating {preprocessed_input_file_path} in {self.args.outputdir}"
