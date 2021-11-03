@@ -9,18 +9,15 @@
 #                        dev@babyMRI.org
 #
 
-import os
-import sys
-
-sys.path.append(os.path.dirname(__file__))
-from inference import Inference
 # import the Chris app superclass
 from chrisapp.base import ChrisApp
+
+from covidnet_grad_cam.inference import Inference
 
 Gstr_title = """
 
 Generate a title from
-http://patorjk.com/software/taag/#p=display&f=Doom&t=Grad-CAM
+http://patorjk.com/software/taag/#p=display&f=Doom&t=COVID-Net-Grad-CAM
 
 """
 
@@ -96,24 +93,17 @@ class GradCam(ChrisApp):
     """
     Plugin to ChRIS for Grad-CAM functionalities.
     """
-    AUTHORS = 'Matthew Wang, DarwinAI (matthew.wang@darwinai.ca)'
-    SELFPATH = os.path.dirname(os.path.abspath(__file__))
-    SELFEXEC = os.path.basename(__file__)
-    EXECSHELL = 'python3'
-    TITLE = 'A ChRIS plugin app'
+    PACKAGE = __package__
+    TITLE = 'Plugin to ChRIS for Grad-CAM functionalities'
     CATEGORY = ''
     TYPE = 'ds'
-    DESCRIPTION = 'Plugin to ChRIS for Grad-CAM functionalities'
-    DOCUMENTATION = 'https://github.com/darwinai/pl-grad-cam'
-    VERSION = '0.1'
     ICON = ''  # url of an icon image
-    LICENSE = 'AGPL 3.0'
     MAX_NUMBER_OF_WORKERS = 1  # Override with integer value
     MIN_NUMBER_OF_WORKERS = 1  # Override with integer value
     MAX_CPU_LIMIT = ''  # Override with millicore value as string, e.g. '2000m'
     MIN_CPU_LIMIT = ''  # Override with millicore value as string, e.g. '2000m'
     MAX_MEMORY_LIMIT = ''  # Override with string, e.g. '1Gi', '2000Mi'
-    MIN_MEMORY_LIMIT = ''  # Override with string, e.g. '1Gi', '2000Mi'
+    MIN_MEMORY_LIMIT = '1Gi'  # Override with string, e.g. '1Gi', '2000Mi'
     MIN_GPU_LIMIT = 0  # Override with the minimum number of GPUs, as an integer, for your plugin
     MAX_GPU_LIMIT = 0  # Override with the maximum number of GPUs, as an integer, for your plugin
 
@@ -166,7 +156,7 @@ class GradCam(ChrisApp):
                           default=0.08)
 
     def add_model_to_options(self, options, model_info):
-        options.weightspath = os.getcwd() + model_info['weightspath']
+        options.weightspath = model_info['weightspath']
         options.ckptname = model_info['ckptname']
         options.metaname = model_info['metaname']
         options.in_tensor = model_info['in_tensor']
@@ -185,7 +175,7 @@ class GradCam(ChrisApp):
         print('Version: %s' % self.get_version())
         models = {
             'COVIDNet-CXR4-B': {
-                'weightspath': '/models/COVIDNet-CXR4-B',
+                'weightspath': '/usr/local/lib/covidnet/COVIDNet-CXR4-B',
                 'ckptname': 'model-1545',
                 'metaname': 'model.meta',
                 'in_tensor': 'input_1:0',
@@ -206,11 +196,6 @@ class GradCam(ChrisApp):
         """
         print(Gstr_synopsis)
 
-
-# ENTRYPOINT
-if __name__ == "__main__":
-    chris_app = GradCam()
-    chris_app.launch()
 
 # chris app needs to write to files as outputs and taking inputs
 # output a dicom image then ChRIS user interface will be able to show it

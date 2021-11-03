@@ -1,5 +1,5 @@
-pl-grad-cam
-================================
+pl-covidnet-grad-cam
+====================
 
 .. contents:: Table of Contents
 
@@ -55,66 +55,37 @@ Arguments
     The name of the prediction matrix file in the input directory, this is required
 
 
-Setup
------
+Local Build
+-----------
 
-Download the relevant machine learning models whose results will be used as input
-For example, for COVID-NET, download COVIDNet-CXR4-B from https://github.com/lindawangg/COVID-Net/blob/master/docs/models.md
+.. code:: bash
 
-Then, put the downloaded folder(s) in grad_cam/models
-
-The folder structure should be:
-
-pl-grad-cam/grad_cam/models/COVIDNet-CXR4-B
+    DOCKER_BUILDKIT=1 docker build -t local/pl-covidnet-grad-cam .
 
 Run
 ---
 
 .. code:: bash
 
-    cd grad_cam
-    python grad_cam.py --imagefile ex-covid.jpg --predmatrix raw-prediction-matrix-default.json ../in ../out
+    docker run --rm -v $PWD/in:/incoming -v $PWD/out:/outgoing                       \
+        darwinai/covidnet-grad-cam-pl covidnet-grad-cam                              \
+            --imagefile ex-covid.jpg --predmatrix raw-prediction-matrix-default.json \
+            /incoming /outgoing
 
-ex-covid.jpg is the name of the input image in the input directory
 
-`in/` is the input directory, and its relative path from `grad_cam/` is `../in`
+Models
+------
 
-`out/` is the output directory, and its relative path from `grad_cam/` is `../out`
-
-Using ``docker run``
-~~~~~~~~~~~~~~~~~~~~
-
-To run using ``docker``, be sure to assign an "in" directory to ``/incoming`` and an "out" directory to ``/outgoing``. *Make sure that the* ``$(pwd)/out`` *directory is world writable!*
-
-Start from the pl-grad_cam directory
-
-build the container using
-
-.. code:: bash
-
-    docker build -t local/pl-grad-cam .
-
-Now, run the container:
-
-.. code:: bash
-
-    docker run --rm -v $(pwd)/in:/incoming -v $(pwd)/out:/outgoing                       \
-            pl-grad-cam grad_cam --imagefile ex-covid.jpg --predmatrix raw-prediction-matrix-default.json /incoming /outgoing                       \
-
-This is bind mounting the in and out directory under pl-grad-cam. Feel free to create different directories.
-
-Make sure the input directory contain an image that fits the --imagefile argument, and make sure the incoming and outgoing directories used as input are the ones being bind mounted.
-
-You can create different directories using the following command. chmod 777 out just makes out directory writable
-
-.. code:: bash
-
-    mkdir in out && chmod 777 out
+The COVIDNet-CXR4-B model is downloaded from https://drive.google.com/drive/folders/1i5XxVy6A6Dwn0IIoGqpbvQo3xgWlVgB_
+For more information, visit https://github.com/lindawangg/COVID-Net/blob/master/docs/models.md
 
 Note
 ----
-Grad-CAM largely depends on the provided reference model, so make sure that the model that is used to determine the result that is used as input exactly matches the provided reference model.
+Grad-CAM largely depends on the provided reference model, so make sure that the model
+that is used to determine the result that is used as input exactly matches the provided
+reference model.
 
 Acknowledgement
 ---------------
-Insik Kim(insikk) for initial Grad-CAM implementation for ResNet and VGG using tensorflow: https://github.com/insikk/Grad-CAM-tensorflow
+Insik Kim(insikk) for initial Grad-CAM implementation for ResNet and VGG using 
+tensorflow: https://github.com/insikk/Grad-CAM-tensorflow
