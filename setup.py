@@ -9,7 +9,7 @@ setup(
     name='covidnet_grad_cam',
     # for best practices make this version the same as the VERSION class variable
     # defined in your ChrisApp-derived Python class
-    version='0.1.0',
+    version='1.0.0',
     description='Plugin to ChRIS for Grad-CAM functionalities',
     long_description=readme,
     author='DarwinAI (Matthew Wang)',
